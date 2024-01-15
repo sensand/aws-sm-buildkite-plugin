@@ -41,6 +41,13 @@ load_all_secrets_into_env() {
   done
 }
 
+role_arn="${BUILDKITE_PLUGIN_AWS_SM_ROLE_ARN:-}"
+if [[ -n $role_arn ]] ; then
+  build="${BUILDKITE_BUILD_NUMBER:-}"
+
+  assume_role "$role_arn" "$build"
+fi
+
 # parse env items
 while IFS='=' read -r name _ ; do
   if [[ $name =~ ^(BUILDKITE_PLUGIN_AWS_SM_ENV_) ]] ; then
