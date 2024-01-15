@@ -45,6 +45,7 @@ role_arn="${BUILDKITE_PLUGIN_AWS_SM_ROLE_ARN:-}"
 if [[ -n $role_arn ]] ; then
   build="${BUILDKITE_BUILD_NUMBER:-}"
 
+  echo "Assuming role ${role_arn} for build ${build}"
   assume_role "$role_arn" "$build"
 fi
 
