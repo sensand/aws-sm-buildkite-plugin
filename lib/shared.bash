@@ -87,7 +87,7 @@ assume_role() {
   local session_token=$(echo $role_credentials | jq -r '.Credentials.SessionToken')
 
   # Retrieve the secret within the subshell, using the temporary credentials
-  AWS_ACCESS_KEY_ID=$access_key_id
-  AWS_SECRET_ACCESS_KEY=$secret_access_key
-  AWS_SESSION_TOKEN=$session_token
+  export AWS_ACCESS_KEY_ID=$access_key_id
+  export AWS_SECRET_ACCESS_KEY=$secret_access_key
+  export AWS_SESSION_TOKEN=$session_token
 }
