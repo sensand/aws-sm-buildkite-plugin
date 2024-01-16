@@ -60,3 +60,34 @@ function get_secret_value() {
   # assume it's a string
   echo "${secrets}" | jq -r '.SecretString'
 }
+
+assume_role() {
+  local role_arn="$1"
+  local build="$2"
+
+  local role_session_name="aws-sm-buildkite-plugin-session-${build}"
+  local duration_seconds="900"
+
+  # Get the role credentials so that we can assume the role
+  local role_credentials=$(aws sts assume-role \
+    --role-arn "${role_arn}" \
+    --role-session-name "${role_session_name}" \
+    --duration-seconds "${duration_seconds}" \
+    --output json)
+
+  local result=$?
+  if [[ $result -ne 0 ]]; then
+    echo -e "\033[31mFailed to assume role\033[0m" >&2
+    exit 1
+  fi
+
+  # Extract the temporary credentials
+  local access_key_id=$(echo $role_credentials | jq -r '.Credentials.AccessKeyId')
+  local secret_access_key=$(echo $role_credentials | jq -r '.Credentials.SecretAccessKey')
+  local session_token=$(echo $role_credentials | jq -r '.Credentials.SessionToken')
+
+  # Retrieve the secret within the subshell, using the temporary credentials
+  export AWS_ACCESS_KEY_ID=$access_key_id
+  export AWS_SECRET_ACCESS_KEY=$secret_access_key
+  export AWS_SESSION_TOKEN=$session_token
+}

@@ -16,4 +16,6 @@ configuration:
       type: array
     region:
       type: string
+    role_arn:
+      type: string
   required: []
